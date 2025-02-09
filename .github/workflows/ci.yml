@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    name: Build, Test, and SCA Scan
+    name: Build and Test
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -22,27 +22,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Make sure your requirements.txt pins compatible versions.
+          # Install your project's dependencies as defined in requirements.txt
           pip install -r requirements.txt
 
       - name: Run tests with pytest
         env:
-          # Ensures Python looks in the repository root for modules (like app.py)
+          # Ensure that Python can find your modules in the repository root (e.g., app.py)
           PYTHONPATH: ${{ github.workspace }}
         run: |
           pip install pytest
           pytest
-
-      - name: Run SCA check with Safety
-        run: |
-          pip install safety
-          # Use the new 'safety scan' command with no interactive input.
-          # The --exit-code 0 flag prevents the job from failing if vulnerabilities are found.
-          safety scan --exit-code 0 --no-input
-        # Optionally, if you have a SAFETY_API_KEY stored in your repository secrets,
-        # uncomment the env: block below to use it.
-        # env:
-        #   SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
 
   codeql-analysis:
     name: CodeQL Analysis (SAST)
